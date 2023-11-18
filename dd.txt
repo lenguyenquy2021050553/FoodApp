@@ -1,0 +1,66 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
+public class manguon {
+	public static void createDirectory() throws IOException {
+		Configuration configuration = new Configuration();
+		configuration.set("fs.defaultFS", "hdfs://10.0.2.15");
+		FileSystem fileSystem = FileSystem.get(configuration);
+		String directoryName = "BigdataHUMG/HDFS_2021050821";
+		Path path = new Path(directoryName);
+		fileSystem.mkdirs(path);
+	}
+	public static void writeFileToHDFS() throws IOException {
+		Configuration configuration = new Configuration();
+		configuration.set("fs.defaultFS", "hdfs://10.0.2.15");
+		FileSystem fileSystem = FileSystem.get(configuration);
+		
+		String fileName = "read_write_hdfs_example.txt";
+		Path hdfsWritePath = new Path("/user/BigdataHUMG/HDFS_2021050821/" + fileName);
+		FSDataOutputStream fsDataOutputStream = fileSystem.create(hdfsWritePath,true);
+		BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream,StandardCharsets.UTF_8));
+		bufferedWriter.write("2021050821 Phan Thanh Dat");
+		bufferedWriter.newLine();
+		bufferedWriter.close();
+		fileSystem.close();
+	}
+	public static void readFileFromHDFS() throws IOException {
+		Configuration configuration = new Configuration();
+		configuration.set("fs.defaultFS", "hdfs://10.0.2.15");
+		FileSystem fileSystem = FileSystem.get(configuration);
+		
+		String fileName = "read_write_hdfs_example.txt";
+		Path hdfsReadPath = new Path("/user/BigdataHUMG/HDFS_2021050821/" + fileName);
+		FSDataInputStream inputStream = fileSystem.open(hdfsReadPath);
+		String out = IOUtils.toString(inputStream, "UTF_8");
+		System.out.println(out);
+		inputStream.close();
+		fileSystem.close();
+	}
+	public static void main(String[] args) {
+		try{
+			createDirectory();
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		try{
+			writeFileToHDFS();
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		try{
+			readFileFromHDFS();
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+	}
+}
